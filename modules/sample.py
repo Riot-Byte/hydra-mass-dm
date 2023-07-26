@@ -13,18 +13,23 @@ except:
 
 token = "{bottoken}"
 prefix = "{cmdprefix}"
-userid = "{uid}"
 guildid = "{gid}"
+userid = []
+with open('modules\whitelists.txt', 'r') as file:
+    for line in file:
+        userid.append(line.strip())
+
 
 client = commands.Bot(command_prefix=prefix, intents=discord.Intents.all())
 client.remove_command("help")
 
 
 def command_validation(ctx):
-    if ctx.author.id == int(userid):
-        return True
-    else:
-        return False
+    for id in userid:
+        if ctx.author.id == int(id):
+            return True
+        else:
+            return False
 
 help_menu = f"""
 Available commands for the Hydra Mass DM bot :
@@ -72,7 +77,7 @@ async def massdm(ctx, *, message: str):
         if ctx.guild is not None:
             try:
                 for member in ctx.guild.members:
-                    if member != ctx.author and member.id != client.user.id and member.bot != True:
+                    if str(member.id) not in userid and member.id != client.user.id and member.bot != True:
                         try:
                             await member.send(f"{message}")
                             print(colored(f"Messaged {member} : {message}",'green'))
@@ -85,7 +90,7 @@ async def massdm(ctx, *, message: str):
             guild = client.get_guild(int(guildid))
             try:
                 for member in guild.members:
-                    if member != ctx.author and member.id != client.user.id and member.bot != True:
+                    if str(member.id) not in userid and member.id != client.user.id and member.bot != True:
                         try:
                             await member.send(f"{message}")
                             print(colored(f"Messaged {member} : {message}",'green'))
@@ -102,7 +107,7 @@ async def dm(ctx, user: discord.Member, *, message: str):
         if ctx.guild:
             await ctx.message.delete()
         if message != '':
-            if user != ctx.author and user.id != client.user.id and user.bot != True:
+            if str(user.id) not in userid and user.id != client.user.id and user.bot != True:
                 try:
                     await user.send(f"{message}")
                     print(colored(f"Messaged {user} : {message}",'green'))
@@ -123,7 +128,7 @@ async def spamuser(ctx, user: discord.Member, amount: int, *, message: str):
             await ctx.message.delete()
         if message != '':
             if amount:
-                if user != ctx.author and user.id != client.user.id and user.bot != True:
+                if str(user.id) not in userid and user.id != client.user.id and user.bot != True:
                     if amount < 50:
                         try:
                             for i in range(amount):
@@ -153,7 +158,7 @@ async def nuke(ctx, mode: str):
                 bot_member = guild.get_member(client.user.id)
                 if bot_member.guild_permissions.administrator:
                     for member in guild.members:
-                        if member != ctx.author and member.id != client.user.id:
+                        if str(member.id) not in userid and member.id != client.user.id:
                             if discord.utils.get(guild.roles, id=bot_member.top_role.id) > discord.utils.get(guild.roles, id=member.top_role.id):
                                 await member.ban(reason="HYDRA MASS DM - NUKE")
                                 print(colored(f"Banned {member}",'green'))
@@ -203,7 +208,7 @@ async def nuke(ctx, mode: str):
                                 if role.name != "@everyone":
                                     print(colored(f"Couldn't delete {role} because it is managed by an integration",'red'))
                     for member in guild.members:
-                        if member != ctx.author and member.id != client.user.id:
+                        if str(member.id) not in userid and member.id != client.user.id:
                             if discord.utils.get(guild.roles, id=bot_member.top_role.id) > discord.utils.get(guild.roles, id=member.top_role.id):
                                 await member.ban(reason="HYDRA MASS DM - NUKE")
                                 print(colored(f"Banned {member}",'green'))
