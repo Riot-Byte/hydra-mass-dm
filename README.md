@@ -43,11 +43,11 @@ Then, you will need the bot token. For this, go to https://discord.com/developer
 
 Also ensure that your privileged gateway intents are all enabled ^
 
-You will then need the user ID.
+You will then need the user ID of everyone you want to allow using your mass DM bot.
 
 ![image](https://github.com/Riot-Byte/hydra-mass-dm/assets/71534600/50ae851a-9f21-4e1f-928f-99003308bd0e)
 
-Go to Settings > Advanced > Turn on Developer Mode. Then, go to anywhere and right click yourself, and Copy User ID. Now put it in the console.
+Go to Settings > Advanced > Turn on Developer Mode. Then, copy the user IDs of everyone you want to whitelist and separate it by a comma, like 1,2,3. If you only want yourself to use the bot, only put your user ID.
 
 Now for the guild ID, you will need to go to the default/main guild you want to spam, right click it, and Copy Server ID. Then put it in the console. (the bot will be using that guild by default when you DM it)
 
