@@ -25,11 +25,14 @@ client.remove_command("help")
 
 
 def command_validation(ctx):
+    ids = []
     for id in userid:
         if ctx.author.id == int(id):
-            return True
-        else:
-            return False
+            ids.append(id)
+    if len(ids) > 0:
+        return True
+    else:
+        return False
 
 help_menu = f"""
 Available commands for the Hydra Mass DM bot :
