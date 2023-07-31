@@ -79,7 +79,7 @@ def main():
     print("")
     prefix = input(colored("What prefix would you like for the bot? => ",'blue'))
     print("")
-    token = input(colored("What token would you like to use for the bot? => ",'blue'))
+    token = input(colored("Bot token => ",'blue'))
     print("")
     userid = input(colored("User IDs of the whitelisted people (separate by comma) => ",'blue'))
     whitelists = userid.split(",")
