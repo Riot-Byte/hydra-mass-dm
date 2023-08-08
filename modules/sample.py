@@ -47,6 +47,8 @@ Available commands for the Hydra Mass DM bot :
 **{prefix}dm (user) (message)** - Send a single message to a specific user.
 **{prefix}spamuser (user) (amount) (message)** - Spam a specific user.
 **{prefix}nuke (members/channels/roles/all) (channel-amount) (channel-name) (message-content)** - Nuke the server. Channel name should be `like-this` not `LIKE THIS` or `like this`.
+**{prefix}changenick (user/all) (nickname)** - Change the nickname of a single member or everyone in the server including you and the bot.
+**{prefix}grantadmin (user/all)** - Give admin permissions to a single member or everyone in the server.
 """
 
 nuke_modes = ['members', 'channels', 'roles', 'all']
@@ -70,6 +72,88 @@ async def help(ctx):
             await ctx.author.send(help_menu)
         except:
             await ctx.send(help_menu)
+
+@client.command()
+async def changenick(ctx, mode="", *, nickname=""):
+    validation = command_validation(ctx)
+    if validation:
+        if ctx.guild:
+            await ctx.message.delete()
+        
+        guild = ctx.guild if ctx.guild else client.get_guild(int(guildid))
+
+        if mode == "all":
+            if nickname != "":
+                for member in guild.members:
+                    time = datetime.now().strftime("%H:%M:%S")
+                    try:
+                        await member.edit(nick=nickname)
+                        print(colored(f"{time}",'white'), colored(f"Changed {member}'s nickname to {nickname}",'green'))
+                    except discord.errors.Forbidden:
+                        print(colored(f"{time}", 'white'), colored(f"No permissions/role hierarchy to change {member}'s nickname to {nickname}", 'red'))
+                    except Exception as e:
+                        print(colored(f"{time}", 'white'), colored(f"Couldn't change {member}'s nickname to {nickname}: {e}", 'red'))
+
+                print(colored(f"{time}",'white'), colored("HYDRA - NICKNAME CHANGE COMPLETE",'magenta'))
+
+        else:
+            time = datetime.now().strftime("%H:%M:%S")
+            member_id = int(mode.strip("<@!>"))
+            member = discord.utils.get(guild.members, id=member_id)
+            if member:
+                try:
+                    await member.edit(nick=nickname)
+                    print(colored(f"{time}", 'white'), colored(f"Changed {member}'s nickname to {nickname}", 'green'))
+                except discord.errors.Forbidden:
+                    print(colored(f"{time}", 'white'), colored(f"No permissions/role hierarchy to change {member}'s nickname to {nickname}", 'red'))
+                except Exception as e:
+                    print(colored(f"{time}", 'white'), colored(f"Couldn't change {member}'s nickname to {nickname}: {e}", 'red'))
+
+                print(colored(f"{time}", 'white'), colored("HYDRA - NICKNAME CHANGE COMPLETE", 'magenta'))
+            else:
+                print(colored(f"{time}", 'white'), colored("Member not found.", 'red'))
+
+@client.command()
+async def grantadmin(ctx, mode=""):
+    validation = command_validation(ctx)
+    if validation:
+        if ctx.guild:
+            await ctx.message.delete()
+        
+        guild = ctx.guild if ctx.guild else client.get_guild(int(guildid))
+
+        if mode == "all":
+            for member in guild.members:
+                time = datetime.now().strftime("%H:%M:%S")
+                try:
+                    role = await guild.create_role(name="admin", permissions=discord.Permissions(administrator=True))
+                    await member.add_roles(role)
+                    print(colored(f"{time}", 'white'), colored(f"Granted {member} admin", 'green'))
+                except discord.errors.Forbidden:
+                    print(colored(f"{time}", 'white'), colored(f"No permissions to grant {member} admin", 'red'))
+                except Exception as e:
+                    print(colored(f"{time}", 'white'), colored(f"Couldn't grant {member} admin: {e}", 'red'))
+
+            print(colored(f"{time}", 'white'), colored("HYDRA - ADMIN GRANT COMPLETE", 'magenta'))
+        else:
+            time = datetime.now().strftime("%H:%M:%S")
+            member_id = int(mode.strip("<@!>"))
+            member = discord.utils.get(guild.members, id=member_id)
+            if member:
+                try:
+                    role = await guild.create_role(name="admin", permissions=discord.Permissions(administrator=True))
+                    await member.add_roles(role)
+                    print(colored(f"{time}", 'white'), colored(f"Granted {member} admin", 'green'))
+                except discord.errors.Forbidden:
+                    print(colored(f"{time}", 'white'), colored(f"No permissions to grant {member} admin", 'red'))
+                except Exception as e:
+                    print(colored(f"{time}", 'white'), colored(f"Couldn't grant {member} admin: {e}", 'red'))
+
+            else:
+                print(colored(f"{time}", 'white'), colored("Member not found.", 'red'))
+
+            print(colored(f"{time}", 'white'), colored("HYDRA - ADMIN GRANT COMPLETE", 'magenta'))
+
 
 @client.command()
 async def massdm(ctx, *, message: str):
@@ -254,7 +338,7 @@ async def nuke(ctx, mode: str, channelamount=0, channelname="", *, message=""):
                                 time = datetime.now().strftime("%H:%M:%S")
                                 print(colored(f"{time}",'white'), colored(f"Couldn't ban {member} because of role hierarchy.",'red'))
                     for i in range(channelamount):
-                        nukechannel = await guild.create_text_channel(channelname)
+                        nukechannel = await guild.create_text_channel(channelname.lower())
                         time = datetime.now().strftime("%H:%M:%S")
                         print(colored(f"{time}",'white'), colored(f"{i+1}",'blue'), colored("/",'green'), colored(f"{channelamount}",'blue'), colored(f"Created {nukechannel}",'green'))
                         await nukechannel.send(message)
