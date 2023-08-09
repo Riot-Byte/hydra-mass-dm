@@ -13,6 +13,8 @@ This tool was made for educational purposes only and self learning. The develope
 - DM a single user
 - Spam a single user
 - Nuke the server
+- Grant admin to users
+- Change nickname of users
 
 ## Installation
 
